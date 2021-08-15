@@ -1,43 +1,61 @@
 import json
+import os
 
 import wikipedia
 
 wikipedia.set_lang('ru')
 
+print('ДОБРО ПОЖАЛОВАТЬ В ПОИСК ПО ВИКИПЕДИИ!')
+print()
+
+if not os.path.exists('wiki_data.json'):
+    with open('wiki_data.json', 'w') as file:
+        json.dump({}, file)
+
 
 def search_in_data(response, data):
+    """Функция ищет запрос в json файле"""
     for key, value in data.items():
         if response == key:
             return value
 
 
-def search_wiki(response):
+def search_wiki(response, data):
+    """Функция ищет запрос на сайте wikipedia"""
+    page = wikipedia.page(response)
+    summary = page.summary
+    content = page.content
+    url = page.url
+    data[response] = {
+        'summary': summary,
+        'url': url,
+        'content': content,
+    }
+    with open('wiki_data.json', 'w') as file:
+        json.dump(data, file, ensure_ascii=False, indent=4)
+    return data[response]
+
+
+def run():
+    """Поиск запроса сначала по базе, потом на сайте."""
+    usr = input('Введите запрос: ')
     with open('wiki_data.json', 'r') as file:
         data = json.load(file)
         res = search_in_data(usr, data)
         if res:
             return res
         else:
-            page = wikipedia.page(response)
-            summary = page.summary
-            content = page.content
-            url = page.url
-            info = {response: {
-                'summary': summary,
-                'url': url,
-                'content': content,
-            }}
-            with open('wiki_data.json', 'w') as file:
-                json.dump(info, file, ensure_ascii=False, indent=4)
+            info = search_wiki(usr, data)
             return info
 
 
 if __name__ == '__main__':
     while True:
-        usr = input('Введите запрос: ')
-        result = search_wiki(usr)
-        print(f'{result}\n{result["url"]}')
-        print('1.Подробнее\n2.Новый поиск\n3.Выход')
+        result = run()
+        print(f'{result["summary"]}\n{result["url"]}')
+        print('1.Подробнее')
+        print('2.Новый поиск')
+        print('3.Выход')
         user_input = int(input('Ввод: '))
         if user_input == 1:
             print(result['content'])
@@ -45,6 +63,3 @@ if __name__ == '__main__':
             continue
         elif user_input == 3:
             break
-
-
-
