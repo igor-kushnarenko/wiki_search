@@ -23,7 +23,12 @@ def search_in_data(response, data):
 def search_wiki(response, data):
     """Функция ищет запрос на сайте wikipedia"""
     response = response.lower().capitalize()
-    page = wikipedia.page(response)
+    try:
+        page = wikipedia.page(response)
+    except wikipedia.exceptions.DisambiguationError as ex:
+        print('Возможно вы имели ввиду: ')
+        for index, e in enumerate(ex.args[1]):
+            print(f'{index + 1}. {e}')
     title = page.title
     summary = page.summary
     content = page.content
