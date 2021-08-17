@@ -22,11 +22,14 @@ def search_in_data(response, data):
 
 def search_wiki(response, data):
     """Функция ищет запрос на сайте wikipedia"""
+    response = response.lower().capitalize()
     page = wikipedia.page(response)
+    title = page.title
     summary = page.summary
     content = page.content
     url = page.url
     data[response] = {
+        'title': title,
         'summary': summary,
         'url': url,
         'content': content,
