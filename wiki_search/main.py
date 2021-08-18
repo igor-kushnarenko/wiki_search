@@ -20,15 +20,19 @@ def search_in_data(response, data):
             return value
 
 
-def search_wiki(response, data):
-    """Функция ищет запрос на сайте wikipedia"""
+def get_page(response):
     response = response.lower().capitalize()
     try:
         page = wikipedia.page(response)
     except wikipedia.exceptions.DisambiguationError as ex:
-        print('Возможно вы имели ввиду: ')
-        for index, e in enumerate(ex.args[1]):
-            print(f'{index + 1}. {e}')
+        page = wikipedia.page(ex.args[1][0])
+    except wikipedia.exceptions.PageError as ex:
+        page = wikipedia.page(ex.args[0])
+    return page
+
+
+def search_wiki(page, response, data):
+    """Функция ищет запрос на сайте wikipedia"""
     title = page.title
     summary = page.summary
     content = page.content
@@ -53,7 +57,8 @@ def run():
         if res:
             return res
         else:
-            info = search_wiki(usr, data)
+            page = get_page(usr)
+            info = search_wiki(page, usr, data)
             return info
 
 
