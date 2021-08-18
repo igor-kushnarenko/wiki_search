@@ -24,11 +24,14 @@ def get_page(response):
     response = response.lower().capitalize()
     try:
         page = wikipedia.page(response)
+        search = wikipedia.search(response)
     except wikipedia.exceptions.DisambiguationError as ex:
         page = wikipedia.page(ex.args[1][0])
+        search = wikipedia.search(ex.args[1][0])
     except wikipedia.exceptions.PageError as ex:
         page = wikipedia.page(ex.args[0])
-    return page
+        search = wikipedia.search(ex.args[0])
+    return page, search
 
 
 def search_wiki(page, response, data):
@@ -58,7 +61,8 @@ def run():
             return res
         else:
             page = get_page(usr)
-            info = search_wiki(page, usr, data)
+            info = search_wiki(page[0], usr, data)
+            search = page[1] # TODO добавить возможные варианты
             return info
 
 
