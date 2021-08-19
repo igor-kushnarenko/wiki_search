@@ -21,7 +21,9 @@ class DataBase:
             data = json.load(f)
         return data
 
-    def write_db(self, page, data, response):
+    def write_db(self, page_list, data, response):
+        page = page_list[0]
+        choose = page_list[1]
         title = page.title
         summary = page.summary
         content = page.content
@@ -31,6 +33,7 @@ class DataBase:
             'summary': summary,
             'url': url,
             'content': content,
+            'choose': choose,
         }
         with open(self.db, 'w') as file:
             json.dump(data, file, ensure_ascii=False, indent=4)
@@ -61,9 +64,8 @@ class WikiSearchEngine:
         return page, search
 
 
-class Menu:
-    def main_menu(self):
-        response = input('Введите запрос: ')
+class TerminalMenu:
+    def take_result(self, response):
         db = DataBase('wiki_data.json')
         data = db.read_db()
         search = WikiSearchEngine(response, data)
@@ -72,24 +74,31 @@ class Menu:
             return res
         else:
             page = search.search_to_web()
-            result = db.write_db(page[0], data, response)
+            result = db.write_db(page, data, response)
             search = page[1]  # TODO добавить возможные варианты
             return result
 
+    def main_menu(self):
+        wikipedia.set_lang('ru')
+        while True:
+            response = input('Введите запрос: ')
+            result = self.take_result(response)
+            print(f'{result["summary"]}\n{result["url"]}')
+            print('1.ПОДБРОБНЕЕ\n2.НОВЫЙ ПОИСК\n3.ВЫХОД')
+            chooses = [f'{index+1}. {x}' for index, x in enumerate(result['choose'], 3)]
+            print(f'! ВАМ МОЖЕТ БЫТЬ ИНТЕРЕСНО: {", ".join(chooses)}')
+
+            user_input = int(input('Ввод: '))
+            if user_input == 1:
+                print(result['content'])
+            elif user_input == 2:
+                continue
+            elif user_input == 3:
+                break
+            elif user_input == 4:
+                self.take_result(chooses[0])
+
 
 if __name__ == '__main__':
-    wikipedia.set_lang('ru')
-
-    while True:
-        result = Menu().main_menu()
-        print(f'{result["summary"]}\n{result["url"]}')
-        print('1.Подробнее')
-        print('2.Новый поиск')
-        print('3.Выход')
-        user_input = int(input('Ввод: '))
-        if user_input == 1:
-            print(result['content'])
-        elif user_input == 2:
-            continue
-        elif user_input == 3:
-            break
+    TerminalMenu().main_menu()
+    # DataBase('wiki_data.json').create_new_db()
