@@ -99,7 +99,7 @@ class TerminalMenu:
             elif user_input == 2:
                 self.run()
             elif user_input == 3:
-                break
+                exit()
             elif user_input == 4:
                 TerminalMenu().main_menu(chooses[0])
             elif user_input == 5:
