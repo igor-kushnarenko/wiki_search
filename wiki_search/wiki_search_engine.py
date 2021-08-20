@@ -9,8 +9,6 @@ class DataBase:
     """Класс содержащий методы для работы с Базой Данных"""
     def __init__(self, db_name):
         self.db = db_name
-        if not self.db:
-            self.create_new_db()
 
     def create_new_db(self):
         """Создание новой БД"""
@@ -20,6 +18,8 @@ class DataBase:
 
     def read_db(self):
         """Чтение БД"""
+        if not os.path.exists(self.db):
+            self.create_new_db()
         with open(self.db, 'r') as f:
             data = json.load(f)
         return data
