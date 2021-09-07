@@ -83,6 +83,7 @@ class TerminalMenu:
             return result
 
     def main_menu(self, response):
+        """Метод выводящий меню для пользователя"""
         wikipedia.set_lang('ru')
         while True:
             result = self.take_result(response)
@@ -97,7 +98,7 @@ class TerminalMenu:
                 self.run()
             elif user_input == 3:
                 exit()
-            for i in range(4, 14):
+            for i in range(4, len(chooses)+4):
                 if user_input == i:
                     TerminalMenu().main_menu(chooses[i-4])
 
